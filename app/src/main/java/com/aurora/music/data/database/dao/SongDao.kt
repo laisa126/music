@@ -151,7 +151,7 @@ interface SongDao {
         LIMIT :limit
         """,
     )
-    suspend fun search(query: String, limit: Int = 100): List<SongEntity>
+    suspend fun search(query: String, limit: Int): List<SongEntity>
 
     @Upsert
     suspend fun upsertAll(songs: List<SongEntity>)

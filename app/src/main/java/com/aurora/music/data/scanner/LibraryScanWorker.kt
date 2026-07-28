@@ -27,10 +27,13 @@ class LibraryScanWorker @AssistedInject constructor(
     private val repository: MusicRepository,
 ) : CoroutineWorker(context, params) {
 
-    override suspend fun doWork(): Result = runCatching {
+    override suspend fun doWork(): Result = try {
         repository.rescan(force = inputData.getBoolean(KEY_FORCE, false))
         Result.success()
-    }.getOrElse { error ->
+    } catch (cancellation: kotlinx.coroutines.CancellationException) {
+        throw cancellation
+    } catch (error: Exception) {
+        // Interrupted scans (storage removed, process death) retry rather than crash.
         if (runAttemptCount < 3) Result.retry() else Result.failure()
     }
 

@@ -107,9 +107,8 @@ class MediaStoreScanner @Inject constructor(
         add(MediaStore.Audio.Media.DATE_MODIFIED)
         add(MediaStore.Audio.Media.GENRE)
         add(MediaStore.Audio.Media.BITRATE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            add(MediaStore.Audio.Media.DISC_NUMBER)
-        }
+        // DISC_NUMBER exists since API 31; minSdk is 33 so no guard is needed.
+        add(MediaStore.Audio.Media.DISC_NUMBER)
     }.toTypedArray()
 
     private class ColumnIndices(cursor: Cursor) {

@@ -244,7 +244,7 @@ class LocalMusicRepository @Inject constructor(
         val trimmed = query.trim()
         if (trimmed.isBlank()) return@withContext SearchResults()
 
-        val songs = songDao.search(trimmed).toDomain()
+        val songs = songDao.search(trimmed, limit = 100).toDomain()
         // Fuzzy fallback: if the literal LIKE query found little, rank the whole
         // library by similarity so typos still surface results.
         val ranked = if (songs.size < 5) {

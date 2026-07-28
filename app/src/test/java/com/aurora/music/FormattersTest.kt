@@ -50,7 +50,7 @@ class FormattersTest {
         assertEquals("0 B", formatFileSize(0))
         assertEquals("512 B", formatFileSize(512))
         assertEquals("1.0 KB", formatFileSize(1024))
-        assertEquals("5.0 MB", formatFileSize(5 * 1024 * 1024))
+        assertEquals("5.0 MB", formatFileSize(5L * 1024 * 1024))
     }
 
     @Test
@@ -70,7 +70,7 @@ class FormattersTest {
 
     @Test
     fun `fuzzy search tolerates typos and ranks exact matches highest`() {
-        assertEquals(1f, fuzzyScore("Beatles", "beatles"))
+        assertEquals(1f, fuzzyScore("Beatles", "beatles"), 0.001f)
         assertTrue(fuzzyScore("beat", "Beatles") > 0.9f)
         assertTrue(fuzzyScore("beatls", "Beatles") > 0.45f)
         assertTrue(fuzzyScore("zzzz", "Beatles") < 0.45f)

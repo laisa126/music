@@ -86,7 +86,7 @@ fun AuroraTheme(
 
     val accent: Color? = when (settings.accentSource) {
         AccentSource.ARTWORK -> artworkAccent
-        AccentSource.CUSTOM -> Color(settings.customAccentColor.toULong().toLong())
+        AccentSource.CUSTOM -> Color(settings.customAccentColor)
         AccentSource.DYNAMIC -> null
     }
 

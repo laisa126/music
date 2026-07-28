@@ -9,6 +9,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
+import androidx.core.content.ContextCompat
 import androidx.media3.session.SessionToken
 import com.aurora.music.core.common.AppDispatchers
 import com.aurora.music.domain.model.MediaItem
@@ -21,7 +22,6 @@ import com.aurora.music.domain.model.ShuffleMode
 import com.aurora.music.domain.model.SleepTimerOption
 import com.aurora.music.domain.repository.MusicRepository
 import com.aurora.music.player.service.PlaybackService
-import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -101,7 +101,7 @@ class PlayerManager @Inject constructor(
                     startProgressUpdates()
                 }
             },
-            MoreExecutors.directExecutor(),
+            ContextCompat.getMainExecutor(context),
         )
     }
 

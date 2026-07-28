@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bedtime
@@ -45,14 +44,11 @@ import com.aurora.music.core.common.GreetingSlot
 import com.aurora.music.core.designsystem.components.AlbumCarousel
 import com.aurora.music.core.designsystem.components.ArtistCarousel
 import com.aurora.music.core.designsystem.components.EmptyLibraryState
-import com.aurora.music.core.designsystem.components.MediaCard
 import com.aurora.music.core.designsystem.components.ScanProgressState
 import com.aurora.music.core.designsystem.components.SectionHeader
 import com.aurora.music.core.designsystem.components.SongCarousel
 import com.aurora.music.core.designsystem.contourGlow
 import com.aurora.music.core.designsystem.glassSurface
-import com.aurora.music.domain.model.Album
-import com.aurora.music.domain.model.Artist
 import com.aurora.music.domain.model.MediaItem
 import com.aurora.music.domain.model.Mood
 import com.aurora.music.domain.repository.ScanState

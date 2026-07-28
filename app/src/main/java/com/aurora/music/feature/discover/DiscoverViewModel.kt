@@ -39,20 +39,18 @@ class DiscoverViewModel @Inject constructor(
             repository.observeArtists(),
             repository.observeGenres(),
             repository.observeFolders(),
-        ) { albums, artists, genres, folders ->
-            listOf(albums, artists, genres, folders)
-        },
+            ::LibraryCollections,
+        ),
         repository.observeSmartPlaylist(SmartPlaylist.HIDDEN_GEMS, 20),
         repository.observeSmartPlaylist(SmartPlaylist.FLAC_COLLECTION, 20),
         repository.observeSmartPlaylist(SmartPlaylist.HIGH_QUALITY, 20),
         repository.observeSmartPlaylist(SmartPlaylist.RECENTLY_ADDED, 20),
     ) { collections, gems, lossless, highQuality, imported ->
-        @Suppress("UNCHECKED_CAST")
         DiscoverUiState(
-            albums = collections[0] as List<Album>,
-            artists = collections[1] as List<Artist>,
-            genres = collections[2] as List<Genre>,
-            folders = collections[3] as List<Folder>,
+            albums = collections.albums,
+            artists = collections.artists,
+            genres = collections.genres,
+            folders = collections.folders,
             hiddenGems = gems,
             lossless = lossless,
             highestQuality = highQuality,
@@ -65,3 +63,10 @@ class DiscoverViewModel @Inject constructor(
         initialValue = DiscoverUiState(),
     )
 }
+
+private data class LibraryCollections(
+    val albums: List<Album>,
+    val artists: List<Artist>,
+    val genres: List<Genre>,
+    val folders: List<Folder>,
+)
