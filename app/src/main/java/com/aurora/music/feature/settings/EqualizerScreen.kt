@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -205,7 +206,10 @@ private fun BandSlider(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(32.dp),
+        // Parent Row is a fixed height, so fill it to make the child weight resolvable.
+        modifier = Modifier
+            .width(32.dp)
+            .fillMaxHeight(),
     ) {
         Text(
             text = "${gain.toInt()}",
