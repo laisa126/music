@@ -4,11 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowDownward
@@ -93,16 +91,26 @@ fun QueueScreen(
                 )
             }
 
-            itemsIndexedQueue(
+            itemsIndexed(
                 items = state.queue,
-                currentIndex = state.queueIndex,
-                onPlay = viewModel::seekToQueueIndex,
-                onRemove = viewModel::removeFromQueue,
-                onMoveUp = { index -> viewModel.moveQueueItem(index, (index - 1).coerceAtLeast(0)) },
-                onMoveDown = { index ->
-                    viewModel.moveQueueItem(index, (index + 1).coerceAtMost(state.queue.lastIndex))
-                },
-            )
+                key = { index, item -> "${item.id}_$index" },
+            ) { index, item ->
+                QueueRow(
+                    item = item,
+                    isPlaying = index == state.queueIndex,
+                    onPlay = { viewModel.seekToQueueIndex(index) },
+                    onRemove = { viewModel.removeFromQueue(index) },
+                    onMoveUp = {
+                        viewModel.moveQueueItem(index, (index - 1).coerceAtLeast(0))
+                    },
+                    onMoveDown = {
+                        viewModel.moveQueueItem(
+                            index,
+                            (index + 1).coerceAtMost(state.queue.lastIndex),
+                        )
+                    },
+                )
+            }
         }
     }
 
@@ -117,32 +125,30 @@ fun QueueScreen(
     }
 }
 
-private fun androidx.compose.foundation.lazy.LazyListScope.itemsIndexedQueue(
-    items: List<com.aurora.music.domain.model.MediaItem>,
-    currentIndex: Int,
-    onPlay: (Int) -> Unit,
-    onRemove: (Int) -> Unit,
-    onMoveUp: (Int) -> Unit,
-    onMoveDown: (Int) -> Unit,
+@Composable
+private fun QueueRow(
+    item: com.aurora.music.domain.model.MediaItem,
+    isPlaying: Boolean,
+    onPlay: () -> Unit,
+    onRemove: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
 ) {
-    items(count = items.size, key = { "${items[it].id}_$it" }) { index ->
-        val item = items[index]
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            SongRow(
-                item = item,
-                isPlaying = index == currentIndex,
-                onClick = { onPlay(index) },
-                modifier = Modifier.weight(1f),
-            )
-            IconButton(onClick = { onMoveUp(index) }) {
-                Icon(Icons.Rounded.ArrowUpward, contentDescription = "Move up")
-            }
-            IconButton(onClick = { onMoveDown(index) }) {
-                Icon(Icons.Rounded.ArrowDownward, contentDescription = "Move down")
-            }
-            IconButton(onClick = { onRemove(index) }) {
-                Icon(Icons.Rounded.Close, contentDescription = "Remove from queue")
-            }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        SongRow(
+            item = item,
+            isPlaying = isPlaying,
+            onClick = onPlay,
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = onMoveUp) {
+            Icon(Icons.Rounded.ArrowUpward, contentDescription = "Move up")
+        }
+        IconButton(onClick = onMoveDown) {
+            Icon(Icons.Rounded.ArrowDownward, contentDescription = "Move down")
+        }
+        IconButton(onClick = onRemove) {
+            Icon(Icons.Rounded.Close, contentDescription = "Remove from queue")
         }
     }
 }

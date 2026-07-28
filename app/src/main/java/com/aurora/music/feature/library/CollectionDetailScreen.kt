@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -103,8 +103,7 @@ fun CollectionDetailScreen(
                 )
             }
 
-            items(state.tracks, key = { it.id }) { track ->
-                val index = state.tracks.indexOf(track)
+            itemsIndexed(state.tracks, key = { _, track -> track.id }) { index, track ->
                 SongRow(
                     item = track,
                     isPlaying = track.id == currentId,

@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -311,11 +311,11 @@ private fun ResultsList(
     ) {
         if (show(SearchFilter.SONGS) && results.songs.isNotEmpty()) {
             item(key = "songsHeader") { ResultHeader("Songs", results.songs.size) }
-            items(results.songs, key = { "song_${it.id}" }) { song ->
-                SongRow(
-                    item = song,
-                    onClick = { onPlaySong(results.songs.indexOf(song)) },
-                )
+            itemsIndexed(
+                items = results.songs,
+                key = { _, song -> "song_${song.id}" },
+            ) { index, song ->
+                SongRow(item = song, onClick = { onPlaySong(index) })
             }
         }
         if (show(SearchFilter.ALBUMS) && results.albums.isNotEmpty()) {

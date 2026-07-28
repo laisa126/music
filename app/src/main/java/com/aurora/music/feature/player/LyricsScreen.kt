@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -98,8 +99,10 @@ fun LyricsScreen(
                 verticalArrangement = Arrangement.spacedBy(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                items(count = current.synced.size, key = { "${it}_${current.synced[it].timeMs}" }) { index ->
-                    val line = current.synced[index]
+                itemsIndexed(
+                    items = current.synced,
+                    key = { index, line -> "${index}_${line.timeMs}" },
+                ) { index, line ->
                     val isActive = index == activeLine
                     val color by animateColorAsState(
                         targetValue = if (isActive) {

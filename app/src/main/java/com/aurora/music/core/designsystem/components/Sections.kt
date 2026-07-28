@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -87,7 +88,7 @@ fun SongCarousel(
         contentPadding = PaddingValues(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        itemsIndexed(items) { index, item ->
+        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
             MediaCard(
                 title = item.title,
                 subtitle = item.artist,
@@ -96,15 +97,6 @@ fun SongCarousel(
                 onClick = { onItemClick(index) },
             )
         }
-    }
-}
-
-private fun androidx.compose.foundation.lazy.LazyListScope.itemsIndexed(
-    items: List<MediaItem>,
-    itemContent: @Composable (Int, MediaItem) -> Unit,
-) {
-    items(count = items.size, key = { items[it].id }) { index ->
-        itemContent(index, items[index])
     }
 }
 
