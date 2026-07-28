@@ -171,6 +171,12 @@ dependencies {
     implementation(libs.androidx.palette.ktx)
 
     implementation(libs.coil.compose)
+    // ListenableFuture (used by MediaController.buildAsync). The `-android`
+    // flavour avoids pulling in the JRE-only variant.
+    implementation(libs.guava) {
+        // Guava ships an empty stub of this that clashes with the real one.
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
 
     // Phase 2 scaffolding: catalog/streaming networking (anonymous, keyless).
     implementation(libs.retrofit)
