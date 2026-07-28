@@ -101,6 +101,21 @@ private fun HomeContent(
 ) {
     val scanState = state.scanState
 
+    // stringResource is @Composable, so section titles must be resolved here —
+    // LazyListScope lambdas are not composable contexts.
+    val titles = SectionTitles(
+        continueListening = stringResource(R.string.section_continue_listening),
+        recentlyPlayed = stringResource(R.string.section_recently_played),
+        recentlyAdded = stringResource(R.string.section_recently_added),
+        favouriteSongs = stringResource(R.string.section_favourite_songs),
+        favouriteAlbums = stringResource(R.string.section_favourite_albums),
+        favouriteArtists = stringResource(R.string.section_favourite_artists),
+        mostPlayed = stringResource(R.string.section_most_played),
+        recommended = stringResource(R.string.section_recommended),
+        randomPicks = stringResource(R.string.section_random_picks),
+        moods = stringResource(R.string.section_moods),
+    )
+
     // First-run: replace every section with the scan CTA (Section 4).
     if (state.isEmptyLibrary && scanState !is ScanState.Scanning) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -133,28 +148,28 @@ private fun HomeContent(
 
         songSection(
             key = "continue",
-            title = stringResource(R.string.section_continue_listening),
+            title = titles.continueListening,
             items = state.continueListening,
             onPlay = onPlay,
             onSeeAll = { onSeeAll("continue") },
         )
         songSection(
             key = "recentlyPlayed",
-            title = stringResource(R.string.section_recently_played),
+            title = titles.recentlyPlayed,
             items = state.recentlyPlayed,
             onPlay = onPlay,
             onSeeAll = { onSeeAll("recentlyPlayed") },
         )
         songSection(
             key = "recentlyAdded",
-            title = stringResource(R.string.section_recently_added),
+            title = titles.recentlyAdded,
             items = state.recentlyAdded,
             onPlay = onPlay,
             onSeeAll = { onSeeAll("recentlyAdded") },
         )
         songSection(
             key = "favourites",
-            title = stringResource(R.string.section_favourite_songs),
+            title = titles.favouriteSongs,
             items = state.favouriteSongs,
             onPlay = onPlay,
             onSeeAll = { onSeeAll("favourites") },
@@ -163,7 +178,7 @@ private fun HomeContent(
         if (state.favouriteAlbums.isNotEmpty()) {
             item(key = "favAlbumsHeader") {
                 SectionHeader(
-                    title = stringResource(R.string.section_favourite_albums),
+                    title = titles.favouriteAlbums,
                     onSeeAll = { onSeeAll("favouriteAlbums") },
                 )
             }
@@ -175,7 +190,7 @@ private fun HomeContent(
         if (state.favouriteArtists.isNotEmpty()) {
             item(key = "favArtistsHeader") {
                 SectionHeader(
-                    title = stringResource(R.string.section_favourite_artists),
+                    title = titles.favouriteArtists,
                     onSeeAll = { onSeeAll("favouriteArtists") },
                 )
             }
@@ -186,26 +201,26 @@ private fun HomeContent(
 
         songSection(
             key = "mostPlayed",
-            title = stringResource(R.string.section_most_played),
+            title = titles.mostPlayed,
             items = state.mostPlayed,
             onPlay = onPlay,
             onSeeAll = { onSeeAll("mostPlayed") },
         )
         songSection(
             key = "recommended",
-            title = stringResource(R.string.section_recommended),
+            title = titles.recommended,
             items = state.recommended,
             onPlay = onPlay,
         )
         songSection(
             key = "random",
-            title = stringResource(R.string.section_random_picks),
+            title = titles.randomPicks,
             items = state.randomPicks,
             onPlay = onPlay,
         )
 
         item(key = "moodsHeader") {
-            SectionHeader(title = stringResource(R.string.section_moods))
+            SectionHeader(title = titles.moods)
         }
         item(key = "moods") {
             MoodRow(moods = state.moods, onMoodClick = { onSeeAll("mood:${it.name}") })
@@ -372,3 +387,17 @@ private fun moodColors(mood: Mood): List<androidx.compose.ui.graphics.Color> = w
         androidx.compose.ui.graphics.Color(0xFF6B2E1F),
     )
 }
+
+/** Pre-resolved section titles (see note in [HomeContent]). */
+private data class SectionTitles(
+    val continueListening: String,
+    val recentlyPlayed: String,
+    val recentlyAdded: String,
+    val favouriteSongs: String,
+    val favouriteAlbums: String,
+    val favouriteArtists: String,
+    val mostPlayed: String,
+    val recommended: String,
+    val randomPicks: String,
+    val moods: String,
+)
