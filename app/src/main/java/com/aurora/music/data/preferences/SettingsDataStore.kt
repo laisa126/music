@@ -2,6 +2,7 @@ package com.aurora.music.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -110,7 +111,7 @@ class SettingsDataStore @Inject constructor(
         lastSeenVersionCode = this[Keys.LAST_SEEN_VERSION] ?: 0,
     )
 
-    private fun MutablePreferencesScope.writeAppSettings(s: AppSettings) {
+    private fun MutablePreferences.writeAppSettings(s: AppSettings) {
         this[Keys.THEME_MODE] = s.themeMode.name
         this[Keys.ACCENT_SOURCE] = s.accentSource.name
         this[Keys.CUSTOM_ACCENT] = s.customAccentColor
@@ -168,7 +169,7 @@ class SettingsDataStore @Inject constructor(
         )
     }
 
-    private fun MutablePreferencesScope.writeEqualizerSettings(s: EqualizerSettings) {
+    private fun MutablePreferences.writeEqualizerSettings(s: EqualizerSettings) {
         this[Keys.EQ_ENABLED] = s.enabled
         this[Keys.EQ_PRESET] = s.presetName
         this[Keys.EQ_GAINS] = s.gains.joinToString(",")
@@ -238,5 +239,3 @@ class SettingsDataStore @Inject constructor(
         val EQ_LIMITER = booleanPreferencesKey("eq_limiter")
     }
 }
-
-private typealias MutablePreferencesScope = androidx.datastore.preferences.core.MutablePreferences

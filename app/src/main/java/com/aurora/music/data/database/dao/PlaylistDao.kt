@@ -36,6 +36,9 @@ interface PlaylistDao {
     @Query("UPDATE playlists SET isPinned = :pinned, lastModified = :now WHERE id = :id")
     suspend fun setPinned(id: Long, pinned: Boolean, now: Long)
 
+    @Query("UPDATE playlists SET lastModified = :now WHERE id = :id")
+    suspend fun touch(id: Long, now: Long)
+
     @Query("DELETE FROM playlists WHERE id = :id")
     suspend fun delete(id: Long)
 

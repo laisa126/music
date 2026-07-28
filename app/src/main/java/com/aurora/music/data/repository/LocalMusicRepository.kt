@@ -388,11 +388,7 @@ class LocalMusicRepository @Inject constructor(
                     PlaylistSongEntity(playlistId, id, start + index, now)
                 },
             )
-            playlistDao.setPinned(
-                playlistId,
-                pinned = false,
-                now = now,
-            ).let { }
+            playlistDao.touch(playlistId, now)
         }
 
     override suspend fun removeFromPlaylist(playlistId: Long, mediaIds: List<String>) =

@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Upsert
 import com.aurora.music.data.database.entity.AlbumStateEntity
 import com.aurora.music.data.database.entity.ArtistStateEntity
@@ -182,7 +181,6 @@ interface SongDao {
     @Query("UPDATE songs SET skipCount = skipCount + 1 WHERE id = :id")
     suspend fun incrementSkipCount(id: String)
 
-    @Transaction
     @Query(
         """
         UPDATE songs SET title = :title, artist = :artist, album = :album,
