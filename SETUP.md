@@ -1,24 +1,11 @@
-# Aurora Music — build & CI setup
+# Aurora Music — build & CI Setup
 
-## Enabling the APK build on GitHub Actions
+## CI on GitHub Actions
 
-The build workflow lives at **`ci/android-build.yml`**. It is not at
-`.github/workflows/` because the agent's GitHub App token lacks the `workflows`
-permission, so pushes containing that path are rejected by GitHub.
+The Android build workflow lives at **`.github/workflows/android-build.yml`**
+and runs automatically on every push and pull request.
 
-To activate CI, copy the file once:
-
-```bash
-mkdir -p .github/workflows
-git mv ci/android-build.yml .github/workflows/android-build.yml
-git commit -m "ci: enable Android build workflow"
-git push
-```
-
-(Or paste the file's contents into a new `.github/workflows/android-build.yml`
-via the GitHub web UI — **Add file → Create new file**.)
-
-## What the workflow does
+### What the workflow does
 
 | Step | Command |
 |---|---|

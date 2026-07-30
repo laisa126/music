@@ -15,9 +15,9 @@ Phase 1 (local-library playback, end to end) is implemented. The architecture is
 deliberately source-agnostic so the Phase 2 catalog/streaming layer can be added
 additively — see [Phase 2 readiness](#phase-2-readiness) below.
 
-> **CI note:** the build workflow is committed at **`ci/android-build.yml`** and
-> must be copied to `.github/workflows/` once to activate. See
-> [`SETUP.md`](SETUP.md) for the one-line command and why.
+> **CI note:** the build workflow runs at **`.github/workflows/android-build.yml`**
+> and produces debug + release APKs on every push. See [`SETUP.md`](SETUP.md)
+> for details.
 
 ## Tech stack
 
