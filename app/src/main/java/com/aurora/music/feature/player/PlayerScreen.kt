@@ -23,7 +23,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,10 +37,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
@@ -60,6 +66,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -608,7 +615,6 @@ private fun NowPlayingProgress(
                 thumbColor = Color.White,
                 activeTrackColor = Color.White,
                 inactiveTrackColor = Color.White.copy(alpha = 0.2f),
-                bufferedTrackColor = Color.White.copy(alpha = 0.35f),
             ),
         )
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -845,7 +851,7 @@ private fun LyricsBottomSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else if (currentLyrics.isSynced) {
-                val listState = remember { androidx.compose.foundation.lazy.rememberLazyListState() }
+                val listState = rememberLazyListState()
                 val activeLine = currentLyrics.synced.indexOfLast {
                     it.timeMs + (currentLyrics.offsetMs) <= state.positionMs
                 }
@@ -878,7 +884,7 @@ private fun LyricsBottomSheet(
                     text = currentLyrics.plainText.orEmpty(),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.fillMaxWidth().height(400.dp)
-                        .verticalScroll(remember { androidx.compose.foundation.rememberScrollState() }),
+                        .verticalScroll(rememberScrollState()),
                 )
             }
             Spacer(Modifier.height(32.dp))
