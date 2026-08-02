@@ -122,6 +122,8 @@ fun MetadataEditorScreen(
             return@Scaffold
         }
 
+        val currentTrack = track!!
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -136,20 +138,20 @@ fun MetadataEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Artwork(
-                        uri = t.artworkUri,
-                        contentDescription = t.album,
+                        uri = currentTrack.artworkUri,
+                        contentDescription = currentTrack.album,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.size(80.dp),
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = t.fileName ?: t.title,
+                            text = currentTrack.fileName ?: currentTrack.title,
                             style = MaterialTheme.typography.titleSmall,
                             maxLines = 2,
                         )
                         Text(
-                            text = t.qualityBadge,
+                            text = currentTrack.qualityBadge,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -259,7 +261,7 @@ fun MetadataEditorScreen(
                 Spacer(Modifier.height(8.dp))
                 Button(
                     onClick = {
-                        val updated = t.copy(
+                        val updated = currentTrack.copy(
                             title = title.trim(),
                             artist = artist.trim(),
                             album = album.trim(),
