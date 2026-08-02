@@ -99,7 +99,10 @@ fun DiscoverScreen(
                 )
             }
             item(key = "gems") {
-                SongCarousel(state.hiddenGems) { playerViewModel.play(state.hiddenGems, it) }
+                SongCarousel(
+                    items = state.hiddenGems,
+                    onItemClick = { index -> playerViewModel.play(state.hiddenGems, index) },
+                )
             }
         }
 
@@ -112,7 +115,10 @@ fun DiscoverScreen(
                 )
             }
             item(key = "lossless") {
-                SongCarousel(state.lossless) { playerViewModel.play(state.lossless, it) }
+                SongCarousel(
+                    items = state.lossless,
+                    onItemClick = { index -> playerViewModel.play(state.lossless, index) },
+                )
             }
         }
 
@@ -124,9 +130,10 @@ fun DiscoverScreen(
                 )
             }
             item(key = "hq") {
-                SongCarousel(state.highestQuality) {
-                    playerViewModel.play(state.highestQuality, it)
-                }
+                SongCarousel(
+                    items = state.highestQuality,
+                    onItemClick = { index -> playerViewModel.play(state.highestQuality, index) },
+                )
             }
         }
 
@@ -138,9 +145,10 @@ fun DiscoverScreen(
                 )
             }
             item(key = "imported") {
-                SongCarousel(state.recentlyImported) {
-                    playerViewModel.play(state.recentlyImported, it)
-                }
+                SongCarousel(
+                    items = state.recentlyImported,
+                    onItemClick = { index -> playerViewModel.play(state.recentlyImported, index) },
+                )
             }
         }
 

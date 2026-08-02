@@ -2,6 +2,7 @@ package com.aurora.music.core.designsystem.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import com.aurora.music.domain.model.MediaItem
  * The standard song row used across Library, Search, Album and Playlist screens.
  * Touch target is >= 48 dp and long-press opens the contextual menu (Section 9).
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SongRow(
     item: MediaItem,
