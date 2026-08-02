@@ -54,6 +54,33 @@ fun MetadataEditorScreen(
 ) {
     val track by viewModel.track.collectAsStateWithLifecycle()
 
+    // Track-loaded flag to avoid overwriting edits on recomposition
+    var loadedId by remember { mutableStateOf<String?>(null) }
+    var title by remember { mutableStateOf("") }
+    var artist by remember { mutableStateOf("") }
+    var album by remember { mutableStateOf("") }
+    var albumArtist by remember { mutableStateOf("") }
+    var composer by remember { mutableStateOf("") }
+    var genre by remember { mutableStateOf("") }
+    var year by remember { mutableStateOf("") }
+    var trackNumber by remember { mutableStateOf("") }
+    var discNumber by remember { mutableStateOf("") }
+
+    // Sync state when track loads or changes
+    val t = track
+    if (t != null && t.id != loadedId) {
+        loadedId = t.id
+        title = t.title
+        artist = t.artist
+        album = t.album
+        albumArtist = t.albumArtist ?: ""
+        composer = t.composer ?: ""
+        genre = t.genre ?: ""
+        year = if (t.year > 0) t.year.toString() else ""
+        trackNumber = if (t.trackNumber > 0) t.trackNumber.toString() else ""
+        discNumber = if (t.discNumber > 0) t.discNumber.toString() else ""
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -94,18 +121,6 @@ fun MetadataEditorScreen(
             LoadingState(modifier = Modifier.padding(padding))
             return@Scaffold
         }
-
-        val t = track!!
-
-        var title by remember(t.title) { mutableStateOf(t.title) }
-        var artist by remember(t.artist) { mutableStateOf(t.artist) }
-        var album by remember(t.album) { mutableStateOf(t.album) }
-        var albumArtist by remember(t.albumArtist) { mutableStateOf(t.albumArtist ?: "") }
-        var composer by remember(t.composer) { mutableStateOf(t.composer ?: "") }
-        var genre by remember(t.genre) { mutableStateOf(t.genre ?: "") }
-        var year by remember(t.year) { mutableStateOf(t.year.toString()) }
-        var trackNumber by remember(t.trackNumber) { mutableStateOf(t.trackNumber.toString()) }
-        var discNumber by remember(t.discNumber) { mutableStateOf(t.discNumber.toString()) }
 
         LazyColumn(
             modifier = Modifier
