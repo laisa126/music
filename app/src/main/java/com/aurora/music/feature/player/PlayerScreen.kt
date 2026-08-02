@@ -132,11 +132,11 @@ fun PlayerScreen(
     if (showLyrics) { LyricsBottomSheet(state = state, lyrics = lyrics, onDismiss = { showLyrics = false }) }
     if (showQueue) { QueueBottomSheet(state = state, onPlay = { viewModel.seekToQueueIndex(it) }, onRemove = { viewModel.removeFromQueue(it) }, onDismiss = { showQueue = false }) }
     if (showSpeed) { SpeedBottomSheet(currentSpeed = state.speed, onSpeedChange = viewModel::setSpeed, onDismiss = { showSpeed = false }) }
-    if (showSleepTimer) { SleepTimerBottomSheet(currentOption = state.sleepTimer, onSelect = viewModel::setSleepTimer, onDismiss = { showSleepTimer = false }) }
+    if (showSleepTimer) { SleepTimerBottomSheet(currentRemainingMs = state.sleepTimerRemainingMs, onSelect = viewModel::setSleepTimer, onDismiss = { showSleepTimer = false }) }
 }
 
 @Composable private fun NowPlayingBackground(albumColors: AlbumColors) {
-    val bgColor by animateColorAsState(targetValue = albumColors.dominant, animationSpec = tween(800), label = "bgColor")
+    val bgColor by animateColorAsState(targetValue = albumColors.primary, animationSpec = tween(800), label = "bgColor")
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(bgColor, bgColor.copy(alpha = 0.85f), bgColor.copy(alpha = 0.6f), Color(0xFF0A0A14)))))
 }
 
@@ -302,7 +302,18 @@ private fun SpeedBottomSheet(currentSpeed: PlaybackSpeed, onSpeedChange: (Playba
 }
 
 @Composable
-private fun SleepTimerBottomSheet(currentOption: SleepTimerOption, onSelect: (SleepTimerOption) -> Unit, onDismiss: () -> Unit) {
+private fun SleepTimerBottomSheet(currentRemainingMs: Long, onSelect: (SleepTimerOption) -> Unit, onDismiss: () -> Unit) {
+    val typography = MontageTheme.typography; val colors = MontageTheme.colors
+    val currentOption = when {
+        currentRemainingMs <= 0L -> SleepTimerOption.OFF
+        currentRemainingMs <= 10 * 60 * 1000L -> SleepTimerOption.TEN
+        currentRemainingMs <= 15 * 60 * 1000L -> SleepTimerOption.FIFTEEN
+        currentRemainingMs <= 30 * 60 * 1000L -> SleepTimerOption.THIRTY
+        currentRemainingMs <= 45 * 60 * 1000L -> SleepTimerOption.FORTY_FIVE
+        currentRemainingMs <= 60 * 60 * 1000L -> SleepTimerOption.SIXTY
+        currentRemainingMs <= 90 * 60 * 1000L -> SleepTimerOption.NINETY
+        else -> SleepTimerOption.ONE_TWENTY
+    }
     val typography = MontageTheme.typography; val colors = MontageTheme.colors
     MontageBottomSheet(visible = true, onDismiss = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = MontageSpacing.xl, vertical = MontageSpacing.md).padding(bottom = MontageSpacing.xxxl)) {

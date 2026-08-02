@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aurora.music.domain.repository.AccentSource
 import com.aurora.music.domain.repository.AnimationLevel
 import com.aurora.music.domain.repository.AppSettings
