@@ -7,9 +7,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.aurora.music.feature.library.CollectionDetailScreen
+import com.aurora.music.feature.library.FileInfoScreen
+import com.aurora.music.feature.library.MetadataEditorScreen
 import com.aurora.music.feature.settings.AboutScreen
+import com.aurora.music.feature.settings.BackupScreen
 
-/** Album / artist / genre / folder / playlist / see-all / about destinations. */
+/** Album / artist / genre / folder / playlist / see-all / about / info / metadata / backup destinations. */
 fun NavGraphBuilder.detailDestinations(
     navController: NavHostController,
     contentPadding: PaddingValues,
@@ -66,7 +69,25 @@ fun NavGraphBuilder.detailDestinations(
         CollectionDetailScreen(onBack = back, contentPadding = contentPadding)
     }
 
+    composable(
+        route = Routes.FILE_INFO,
+        arguments = listOf(navArgument("mediaId") { type = NavType.StringType }),
+    ) {
+        FileInfoScreen(onBack = back)
+    }
+
+    composable(
+        route = Routes.METADATA_EDITOR,
+        arguments = listOf(navArgument("mediaId") { type = NavType.StringType }),
+    ) {
+        MetadataEditorScreen(onBack = back)
+    }
+
     composable(Routes.ABOUT) {
         AboutScreen(onBack = back)
+    }
+
+    composable(Routes.BACKUP) {
+        BackupScreen(onBack = back)
     }
 }

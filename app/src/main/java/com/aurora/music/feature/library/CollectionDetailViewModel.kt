@@ -155,6 +155,10 @@ class CollectionDetailViewModel @Inject constructor(
     fun toggleFavourite(item: MediaItem) {
         viewModelScope.launch { repository.setFavourite(item.id, !item.isFavourite) }
     }
+
+    fun updateMetadata(item: MediaItem) {
+        viewModelScope.launch { repository.updateMetadata(item) }
+    }
 }
 
 private fun String.decode(): String = runCatching { URLDecoder.decode(this, "UTF-8") }
