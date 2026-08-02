@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,15 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,16 +30,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.components.AuroraEmptyState
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontagePrimaryButton
+import com.aurora.music.core.designsystem.montage.MontageSecondaryButton
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
+import com.aurora.music.core.designsystem.montage.MontageIcons
 
 /**
  * Backup and restore screen (spec Section 10).
  * Exports/imports Room DB + DataStore preferences as a ZIP via SAF.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupScreen(
     onBack: () -> Unit,
@@ -57,6 +58,8 @@ fun BackupScreen(
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     var statusMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/zip"),
@@ -74,25 +77,31 @@ fun BackupScreen(
         }
     }
 
-    Scaffold(
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("Backup & Restore") },
+            MontageAppBar(
+                title = "Backup & Restore",
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .background(colors.background)
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(MontageSpacing.screenHorizontal),
+            verticalArrangement = Arrangement.spacedBy(MontageSpacing.base),
         ) {
             item {
                 AuroraEmptyState(
@@ -105,12 +114,13 @@ fun BackupScreen(
 
             item {
                 Column {
-                    Text(
+                    MontageText(
                         text = "What's included",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = typography.labelLarge,
+                        color = colors.accent,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(MontageSpacing.sm))
                     val items = listOf(
                         "All playlists and their track orders",
                         "Favourite songs, albums and artists",
@@ -120,19 +130,19 @@ fun BackupScreen(
                     )
                     items.forEach { item ->
                         Row(
-                            modifier = Modifier.padding(vertical = 2.dp),
+                            modifier = Modifier.padding(vertical = MontageSpacing.xxs),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(
+                            MontageText(
                                 text = "•",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
+                                style = typography.body,
+                                color = colors.accent,
                                 modifier = Modifier.width(16.dp),
                             )
-                            Text(
+                            MontageText(
                                 text = item,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = typography.body,
+                                color = colors.textSecondary,
                             )
                         }
                     }
@@ -142,9 +152,9 @@ fun BackupScreen(
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md),
                 ) {
-                    Button(
+                    MontagePrimaryButton(
                         onClick = {
                             val timestamp = java.text.SimpleDateFormat(
                                 "yyyyMMdd-HHmmss",
@@ -154,48 +164,60 @@ fun BackupScreen(
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Icon(
-                            Icons.Rounded.Backup,
+                        MontageIcon(
+                            imageVector = Icons.Rounded.Backup,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            tint = colors.textOnAccent,
+                            modifier = Modifier.size(MontageIcons.small),
                         )
-                        Spacer(Modifier.width(8.dp))
-                        Text("Back up")
+                        Spacer(Modifier.width(MontageSpacing.sm))
+                        MontageText(
+                            text = "Back up",
+                            style = typography.label,
+                            color = colors.textOnAccent,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                        )
                     }
-                    OutlinedButton(
+                    MontageSecondaryButton(
                         onClick = {
                             importLauncher.launch(arrayOf("application/zip", "application/octet-stream"))
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Icon(
-                            Icons.Rounded.Info,
+                        MontageIcon(
+                            imageVector = Icons.Rounded.Info,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(MontageIcons.small),
                         )
-                        Spacer(Modifier.width(8.dp))
-                        Text("Restore")
+                        Spacer(Modifier.width(MontageSpacing.sm))
+                        MontageText(
+                            text = "Restore",
+                            style = typography.label,
+                            color = colors.textPrimary,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                        )
                     }
                 }
             }
 
             if (statusMessage != null) {
                 item {
-                    Text(
+                    MontageText(
                         text = statusMessage!!,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        style = typography.body,
+                        color = colors.accent,
+                        modifier = Modifier.padding(vertical = MontageSpacing.sm),
                     )
                 }
             }
 
             item {
-                Text(
+                MontageText(
                     text = "Tip: Back up before major updates. Restore works across installs " +
                         "on the same device.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = typography.caption,
+                    color = colors.textSecondary,
                 )
             }
         }

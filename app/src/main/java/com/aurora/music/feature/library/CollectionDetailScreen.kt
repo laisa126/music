@@ -1,5 +1,6 @@
 package com.aurora.music.feature.library
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,21 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Shuffle
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,10 +33,20 @@ import com.aurora.music.core.common.formatDurationLong
 import com.aurora.music.core.designsystem.components.Artwork
 import com.aurora.music.core.designsystem.components.LoadingState
 import com.aurora.music.core.designsystem.components.SongRow
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontagePrimaryButton
+import com.aurora.music.core.designsystem.montage.MontageSecondaryButton
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
+import com.aurora.music.core.designsystem.montage.MontageIcons
 import com.aurora.music.feature.player.PlayerViewModel
 
 /** Shared detail screen for albums, artists, genres, folders, playlists and "See all". */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionDetailScreen(
     onBack: () -> Unit,
@@ -58,38 +59,39 @@ fun CollectionDetailScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val playerState by playerViewModel.state.collectAsStateWithLifecycle()
     val currentId = playerState.current?.id
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
-    Scaffold(
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = state.title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
+            MontageAppBar(
+                title = state.title,
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         if (state.isLoading) {
-            LoadingState(modifier = Modifier.padding(padding))
-            return@Scaffold
+            LoadingState(modifier = Modifier.padding(top = padding.calculateTopPadding()))
+            return@MontageScaffold
         }
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(colors.background)
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
-                bottom = contentPadding.calculateBottomPadding() + 24.dp,
+                bottom = contentPadding.calculateBottomPadding() + MontageSpacing.xl,
             ),
         ) {
             item(key = "header") {
@@ -119,14 +121,14 @@ fun CollectionDetailScreen(
 
             if (state.tracks.isEmpty()) {
                 item(key = "empty") {
-                    Text(
+                    MontageText(
                         text = "Nothing here yet.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = typography.body,
+                        color = colors.textSecondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(32.dp),
+                            .padding(MontageSpacing.xxxl),
                     )
                 }
             }
@@ -143,49 +145,79 @@ private fun CollectionHeader(
     onPlay: () -> Unit,
     onShuffle: () -> Unit,
 ) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = MontageSpacing.screenHorizontal),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Artwork(
             uri = artworkUri,
             contentDescription = title,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(MontageSpacing.xl),
             glow = true,
             modifier = Modifier.size(190.dp),
         )
-        Spacer(Modifier.height(16.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.base))
+        MontageText(
             text = title,
-            style = MaterialTheme.typography.headlineSmall,
+            style = typography.heading,
+            color = colors.textPrimary,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        Spacer(Modifier.height(4.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.xs))
+        MontageText(
             text = listOf(subtitle, formatDurationLong(totalDurationMs))
                 .filter { it.isNotBlank() }
                 .joinToString(" · "),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.caption,
+            color = colors.textSecondary,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(18.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = onPlay, modifier = Modifier.weight(1f)) {
-                Icon(Icons.Rounded.PlayArrow, contentDescription = null)
-                Spacer(Modifier.width(6.dp))
-                Text("Play")
+        Spacer(Modifier.height(MontageSpacing.lg))
+        Row(horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md)) {
+            MontagePrimaryButton(
+                onClick = onPlay,
+                modifier = Modifier.weight(1f),
+            ) {
+                MontageIcon(
+                    imageVector = Icons.Rounded.PlayArrow,
+                    contentDescription = null,
+                    tint = colors.textOnAccent,
+                    modifier = Modifier.size(MontageIcons.medium),
+                )
+                Spacer(Modifier.width(MontageSpacing.sm))
+                MontageText(
+                    text = "Play",
+                    style = typography.label,
+                    color = colors.textOnAccent,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
-            OutlinedButton(onClick = onShuffle, modifier = Modifier.weight(1f)) {
-                Icon(Icons.Rounded.Shuffle, contentDescription = null)
-                Spacer(Modifier.width(6.dp))
-                Text("Shuffle")
+            MontageSecondaryButton(
+                onClick = onShuffle,
+                modifier = Modifier.weight(1f),
+            ) {
+                MontageIcon(
+                    imageVector = Icons.Rounded.Shuffle,
+                    contentDescription = null,
+                    tint = colors.textSecondary,
+                    modifier = Modifier.size(MontageIcons.medium),
+                )
+                Spacer(Modifier.width(MontageSpacing.sm))
+                MontageText(
+                    text = "Shuffle",
+                    style = typography.label,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(MontageSpacing.base))
     }
 }

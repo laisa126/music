@@ -1,5 +1,6 @@
 package com.aurora.music.feature.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -9,50 +10,64 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import com.aurora.music.BuildConfig
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    Scaffold(
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
+
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("About") },
+            MontageAppBar(
+                title = "About",
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(20.dp),
+                .background(colors.background)
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(MontageSpacing.screenHorizontal),
         ) {
             item {
                 Column {
-                    Text("Aurora Music", style = MaterialTheme.typography.headlineSmall)
-                    Text(
+                    MontageText(
+                        text = "Aurora Music",
+                        style = typography.title,
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    MontageText(
                         text = "Version ${BuildConfig.VERSION_NAME} " +
                             "(build ${BuildConfig.VERSION_CODE})",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = typography.caption,
+                        color = colors.textSecondary,
                     )
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(MontageSpacing.xxl))
 
                     Section(
                         "Privacy",
@@ -97,17 +112,20 @@ fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 private fun Section(title: String, body: String) {
-    Column(modifier = Modifier.padding(bottom = 20.dp)) {
-        Text(
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
+    Column(modifier = Modifier.padding(bottom = MontageSpacing.xxl)) {
+        MontageText(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary,
+            style = typography.labelLarge,
+            color = colors.accent,
+            fontWeight = FontWeight.SemiBold,
         )
-        Spacer(Modifier.height(6.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.sm))
+        MontageText(
             text = body,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.body,
+            color = colors.textSecondary,
         )
     }
 }

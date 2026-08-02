@@ -1,5 +1,6 @@
 package com.aurora.music.feature.library
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,18 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Album
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Save
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,17 +26,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.components.Artwork
 import com.aurora.music.core.designsystem.components.LoadingState
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontagePrimaryButton
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTextField
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
+import com.aurora.music.core.designsystem.montage.MontageIcons
 
 /**
  * Metadata editor screen for editing track tags (spec Section 9).
  * Edits are saved to the Room database; tag writing to files is a future feature.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetadataEditorScreen(
     onBack: () -> Unit,
@@ -53,6 +55,8 @@ fun MetadataEditorScreen(
     viewModel: TrackDetailViewModel = hiltViewModel(),
 ) {
     val track by viewModel.track.collectAsStateWithLifecycle()
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
     // Track-loaded flag to avoid overwriting edits on recomposition
     var loadedId by remember { mutableStateOf<String?>(null) }
@@ -81,20 +85,24 @@ fun MetadataEditorScreen(
         discNumber = if (t.discNumber > 0) t.discNumber.toString() else ""
     }
 
-    Scaffold(
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("Edit metadata") },
+            MontageAppBar(
+                title = "Edit metadata",
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
                 actions = {
-                    IconButton(
+                    MontageIconButton(
                         onClick = {
-                            val current = track ?: return@IconButton
+                            val current = track ?: return@MontageIconButton
                             val updated = current.copy(
                                 title = title.trim(),
                                 artist = artist.trim(),
@@ -111,15 +119,20 @@ fun MetadataEditorScreen(
                         },
                         enabled = track != null,
                     ) {
-                        Icon(Icons.Rounded.Save, contentDescription = "Save")
+                        MontageIcon(
+                            imageVector = Icons.Rounded.Save,
+                            contentDescription = "Save",
+                            tint = colors.accent,
+                        )
                     }
                 },
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         if (track == null) {
-            LoadingState(modifier = Modifier.padding(padding))
-            return@Scaffold
+            LoadingState(modifier = Modifier.padding(top = padding.calculateTopPadding()))
+            return@MontageScaffold
         }
 
         val currentTrack = track!!
@@ -127,9 +140,10 @@ fun MetadataEditorScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .background(colors.background)
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(MontageSpacing.screenHorizontal),
+            verticalArrangement = Arrangement.spacedBy(MontageSpacing.md),
         ) {
             // Artwork header
             item {
@@ -143,123 +157,137 @@ fun MetadataEditorScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.size(80.dp),
                     )
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(MontageSpacing.base))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
+                        MontageText(
                             text = currentTrack.fileName ?: currentTrack.title,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = typography.labelLarge,
+                            color = colors.textPrimary,
+                            fontWeight = FontWeight.SemiBold,
                             maxLines = 2,
                         )
-                        Text(
+                        MontageText(
                             text = currentTrack.qualityBadge,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = typography.label,
+                            color = colors.textSecondary,
                         )
                     }
                 }
             }
 
             item {
-                Text(
+                MontageText(
                     text = "Note: Changes are saved to Aurora's database. Writing tags to " +
                         "files will be available in a future update.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    style = typography.caption,
+                    color = colors.textSecondary,
+                    modifier = Modifier.padding(vertical = MontageSpacing.xs),
                 )
             }
 
             // Editable fields
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Title") },
-                    leadingIcon = { Icon(Icons.Rounded.MusicNote, contentDescription = null) },
+                    placeholder = "Title",
+                    leadingIcon = {
+                        MontageIcon(
+                            imageVector = Icons.Rounded.MusicNote,
+                            contentDescription = null,
+                            tint = colors.textTertiary,
+                            modifier = Modifier.size(MontageIcons.medium),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = artist,
                     onValueChange = { artist = it },
-                    label = { Text("Artist") },
-                    leadingIcon = { Icon(Icons.Rounded.MusicNote, contentDescription = null) },
+                    placeholder = "Artist",
+                    leadingIcon = {
+                        MontageIcon(
+                            imageVector = Icons.Rounded.MusicNote,
+                            contentDescription = null,
+                            tint = colors.textTertiary,
+                            modifier = Modifier.size(MontageIcons.medium),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = album,
                     onValueChange = { album = it },
-                    label = { Text("Album") },
-                    leadingIcon = { Icon(Icons.Rounded.Album, contentDescription = null) },
+                    placeholder = "Album",
+                    leadingIcon = {
+                        MontageIcon(
+                            imageVector = Icons.Rounded.Album,
+                            contentDescription = null,
+                            tint = colors.textTertiary,
+                            modifier = Modifier.size(MontageIcons.medium),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = albumArtist,
                     onValueChange = { albumArtist = it },
-                    label = { Text("Album artist") },
+                    placeholder = "Album artist",
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = composer,
                     onValueChange = { composer = it },
-                    label = { Text("Composer") },
+                    placeholder = "Composer",
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
-                OutlinedTextField(
+                MontageTextField(
                     value = genre,
                     onValueChange = { genre = it },
-                    label = { Text("Genre") },
+                    placeholder = "Genre",
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
                 )
             }
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md),
                 ) {
-                    OutlinedTextField(
+                    MontageTextField(
                         value = year,
                         onValueChange = { year = it },
-                        label = { Text("Year") },
+                        placeholder = "Year",
                         modifier = Modifier.weight(1f),
-                        singleLine = true,
                     )
-                    OutlinedTextField(
+                    MontageTextField(
                         value = trackNumber,
                         onValueChange = { trackNumber = it },
-                        label = { Text("Track #") },
+                        placeholder = "Track #",
                         modifier = Modifier.weight(1f),
-                        singleLine = true,
                     )
-                    OutlinedTextField(
+                    MontageTextField(
                         value = discNumber,
                         onValueChange = { discNumber = it },
-                        label = { Text("Disc #") },
+                        placeholder = "Disc #",
                         modifier = Modifier.weight(1f),
-                        singleLine = true,
                     )
                 }
             }
 
             // Save button
             item {
-                Spacer(Modifier.height(8.dp))
-                Button(
+                Spacer(Modifier.height(MontageSpacing.sm))
+                MontagePrimaryButton(
                     onClick = {
                         val updated = currentTrack.copy(
                             title = title.trim(),
@@ -277,9 +305,19 @@ fun MetadataEditorScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Icon(Icons.Rounded.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Save changes")
+                    MontageIcon(
+                        imageVector = Icons.Rounded.Save,
+                        contentDescription = null,
+                        tint = colors.textOnAccent,
+                        modifier = Modifier.size(MontageIcons.small),
+                    )
+                    Spacer(Modifier.width(MontageSpacing.sm))
+                    MontageText(
+                        text = "Save changes",
+                        style = typography.label,
+                        color = colors.textOnAccent,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
         }

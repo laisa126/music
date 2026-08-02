@@ -20,15 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,15 +27,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.glassSurface
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageChip
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSlider
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageSwitch
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
 import com.aurora.music.domain.model.BuiltInPresets
 import com.aurora.music.domain.model.EQ_BANDS_HZ
 import com.aurora.music.domain.model.formatBandLabel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EqualizerScreen(
     onBack: () -> Unit,
@@ -52,86 +54,84 @@ fun EqualizerScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val eq by viewModel.equalizer.collectAsStateWithLifecycle()
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
-    Scaffold(
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("Equalizer") },
+            MontageAppBar(
+                title = "Equalizer",
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
                 actions = {
-                    Switch(
+                    MontageSwitch(
                         checked = eq.enabled,
                         onCheckedChange = viewModel::setEqualizerEnabled,
-                        modifier = Modifier.padding(end = 12.dp),
+                        modifier = Modifier.padding(end = MontageSpacing.md),
                     )
                 },
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(bottom = 32.dp),
+                .background(colors.background)
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(bottom = MontageSpacing.xxxl),
         ) {
             item(key = "presets") {
-                Text(
+                MontageText(
                     text = "Presets",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 20.dp, top = 12.dp, bottom = 8.dp),
+                    style = typography.labelLarge,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(
+                        start = MontageSpacing.screenHorizontal,
+                        top = MontageSpacing.md,
+                        bottom = MontageSpacing.sm,
+                    ),
                 )
                 LazyRow(
-                    contentPadding = PaddingValues(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = MontageSpacing.screenHorizontal),
+                    horizontalArrangement = Arrangement.spacedBy(MontageSpacing.sm),
                 ) {
                     items(BuiltInPresets.all, key = { it.name }) { preset ->
-                        val selected = preset.name == eq.presetName
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .then(
-                                    if (selected) {
-                                        Modifier.background(MaterialTheme.colorScheme.primary)
-                                    } else {
-                                        Modifier.glassSurface(
-                                            shape = RoundedCornerShape(50),
-                                            alpha = 0.5f,
-                                        )
-                                    },
-                                )
-                                .clickable { viewModel.applyPreset(preset) }
-                                .padding(horizontal = 14.dp, vertical = 8.dp),
-                        ) {
-                            Text(
-                                text = preset.name,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = if (selected) {
-                                    MaterialTheme.colorScheme.onPrimary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                            )
-                        }
+                        MontageChip(
+                            label = preset.name,
+                            selected = preset.name == eq.presetName,
+                            onClick = { viewModel.applyPreset(preset) },
+                        )
                     }
                 }
             }
 
             item(key = "bands") {
-                Text(
+                MontageText(
                     text = "10-band equalizer",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 20.dp, top = 24.dp, bottom = 12.dp),
+                    style = typography.labelLarge,
+                    color = colors.textPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(
+                        start = MontageSpacing.screenHorizontal,
+                        top = MontageSpacing.xxl,
+                        bottom = MontageSpacing.md,
+                    ),
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(260.dp)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = MontageSpacing.sm),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     EQ_BANDS_HZ.forEachIndexed { index, hz ->
@@ -146,7 +146,12 @@ fun EqualizerScreen(
             }
 
             item(key = "effects") {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = MontageSpacing.screenHorizontal,
+                        vertical = MontageSpacing.md,
+                    ),
+                ) {
                     EffectSlider(
                         "Bass boost",
                         eq.bassBoost,
@@ -185,11 +190,19 @@ fun EqualizerScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp),
+                            .padding(top = MontageSpacing.sm),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Limiter", modifier = Modifier.weight(1f))
-                        Switch(checked = eq.limiterEnabled, onCheckedChange = viewModel::setLimiter)
+                        MontageText(
+                            text = "Limiter",
+                            style = typography.body,
+                            color = colors.textPrimary,
+                            modifier = Modifier.weight(1f),
+                        )
+                        MontageSwitch(
+                            checked = eq.limiterEnabled,
+                            onCheckedChange = viewModel::setLimiter,
+                        )
                     }
                 }
             }
@@ -204,17 +217,18 @@ private fun BandSlider(
     enabled: Boolean,
     onGainChange: (Float) -> Unit,
 ) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        // Parent Row is a fixed height, so fill it to make the child weight resolvable.
         modifier = Modifier
             .width(32.dp)
             .fillMaxHeight(),
     ) {
-        Text(
+        MontageText(
             text = "${gain.toInt()}",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.mini,
+            color = colors.textTertiary,
         )
         Box(
             modifier = Modifier
@@ -222,7 +236,7 @@ private fun BandSlider(
                 .width(32.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Slider(
+            MontageSlider(
                 value = gain,
                 onValueChange = onGainChange,
                 valueRange = -12f..12f,
@@ -230,7 +244,6 @@ private fun BandSlider(
                 modifier = Modifier
                     .graphicsLayer { rotationZ = 270f }
                     .layout { measurable, constraints ->
-                        // Rotate the slider into a vertical fader.
                         val placeable = measurable.measure(
                             constraints.copy(
                                 minWidth = constraints.minHeight,
@@ -248,11 +261,11 @@ private fun BandSlider(
                     },
             )
         }
-        Spacer(Modifier.height(4.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.xxs))
+        MontageText(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.mini,
+            color = colors.textTertiary,
         )
     }
 }
@@ -265,16 +278,24 @@ private fun EffectSlider(
     enabled: Boolean,
     onValueChange: (Float) -> Unit,
 ) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
+    Column(modifier = Modifier.padding(vertical = MontageSpacing.xs)) {
         Row {
-            Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-            Text(
+            MontageText(
+                text = label,
+                style = typography.body,
+                color = colors.textPrimary,
+                modifier = Modifier.weight(1f),
+            )
+            MontageText(
                 text = String.format(java.util.Locale.US, "%.1f", value),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = typography.label,
+                color = colors.textSecondary,
+                fontWeight = FontWeight.Medium,
             )
         }
-        Slider(
+        MontageSlider(
             value = value,
             onValueChange = onValueChange,
             valueRange = range,

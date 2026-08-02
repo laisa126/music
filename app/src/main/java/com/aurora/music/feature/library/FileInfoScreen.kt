@@ -1,5 +1,6 @@
 package com.aurora.music.feature.library
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,13 +21,6 @@ import androidx.compose.material.icons.rounded.AudioFile
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.MusicNote
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,12 +30,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.components.Artwork
 import com.aurora.music.core.designsystem.components.LoadingState
+import com.aurora.music.core.designsystem.montage.MontageAppBar
+import com.aurora.music.core.designsystem.montage.MontageIconButton
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageScaffold
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
+import com.aurora.music.core.designsystem.montage.MontageIcons
 
 /**
  * Detailed file information screen showing codec, bitrate, sample rate,
  * file size, path and other technical metadata (spec Section 9).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileInfoScreen(
     onBack: () -> Unit,
@@ -49,23 +51,30 @@ fun FileInfoScreen(
     viewModel: TrackDetailViewModel = hiltViewModel(),
 ) {
     val track by viewModel.track.collectAsStateWithLifecycle()
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
-    Scaffold(
+    MontageScaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("File information") },
+            MontageAppBar(
+                title = "File information",
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    MontageIconButton(onClick = onBack) {
+                        MontageIcon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.textPrimary,
+                        )
                     }
                 },
             )
         },
+        containerColor = colors.background,
     ) { padding ->
         if (track == null) {
-            LoadingState(modifier = Modifier.padding(padding))
-            return@Scaffold
+            LoadingState(modifier = Modifier.padding(top = padding.calculateTopPadding()))
+            return@MontageScaffold
         }
 
         val t = track!!
@@ -73,9 +82,10 @@ fun FileInfoScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .background(colors.background)
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(MontageSpacing.screenHorizontal),
+            verticalArrangement = Arrangement.spacedBy(MontageSpacing.sm),
         ) {
             // Header with artwork
             item {
@@ -89,23 +99,24 @@ fun FileInfoScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.size(80.dp),
                     )
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(MontageSpacing.base))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
+                        MontageText(
                             text = t.title,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = typography.heading,
+                            color = colors.textPrimary,
                             maxLines = 2,
                         )
-                        Text(
+                        MontageText(
                             text = t.artist,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = typography.caption,
+                            color = colors.textSecondary,
                         )
                     }
                 }
             }
 
-            item { Spacer(Modifier.height(8.dp)) }
+            item { Spacer(Modifier.height(MontageSpacing.sm)) }
 
             // Audio section
             item {
@@ -130,7 +141,7 @@ fun FileInfoScreen(
                     if (t.isLossless) "Yes" else "No")
             }
 
-            item { Spacer(Modifier.height(8.dp)) }
+            item { Spacer(Modifier.height(MontageSpacing.sm)) }
 
             // File section
             item {
@@ -151,7 +162,7 @@ fun FileInfoScreen(
                     else "Unknown")
             }
 
-            item { Spacer(Modifier.height(8.dp)) }
+            item { Spacer(Modifier.height(MontageSpacing.sm)) }
 
             // Track metadata section
             item {
@@ -177,11 +188,14 @@ fun FileInfoScreen(
 
 @Composable
 private fun SectionHeader(title: String) {
-    Text(
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
+    MontageText(
         text = title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+        style = typography.labelLarge,
+        color = colors.accent,
+        fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+        modifier = Modifier.padding(top = MontageSpacing.sm, bottom = MontageSpacing.xs),
     )
 }
 
@@ -191,29 +205,31 @@ private fun InfoRow(
     label: String,
     value: String,
 ) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = MontageSpacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            icon,
+        MontageIcon(
+            imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(18.dp),
+            tint = colors.textTertiary,
+            modifier = Modifier.size(MontageIcons.small),
         )
-        Spacer(Modifier.width(12.dp))
-        Text(
+        Spacer(Modifier.width(MontageSpacing.md))
+        MontageText(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.body,
+            color = colors.textSecondary,
             modifier = Modifier.width(100.dp),
         )
-        Text(
+        MontageText(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = typography.body,
+            color = colors.textPrimary,
             modifier = Modifier.weight(1f),
         )
     }

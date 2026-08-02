@@ -24,17 +24,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,12 +40,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.contourGlow
 import com.aurora.music.core.designsystem.glassSurface
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageLinearProgress
+import com.aurora.music.core.designsystem.montage.MontagePrimaryButton
+import com.aurora.music.core.designsystem.montage.MontageSecondaryButton
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
+import com.aurora.music.core.designsystem.montage.MontageIcons
 import com.aurora.music.domain.repository.ScanState
 
 /**
@@ -66,6 +71,8 @@ fun OnboardingScreen(
     var step by remember { mutableIntStateOf(0) }
     val scanState by viewModel.scanState.collectAsStateWithLifecycle()
     val hasPermission by viewModel.hasPermission.collectAsStateWithLifecycle()
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -90,7 +97,7 @@ fun OnboardingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(colors.background)
             .windowInsetsPadding(WindowInsets.systemBars),
     ) {
         AnimatedContent(
@@ -151,7 +158,7 @@ fun OnboardingScreen(
                 total = 3,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 24.dp),
+                    .padding(bottom = MontageSpacing.xl),
             )
         }
     }
@@ -177,10 +184,12 @@ private fun OnboardingPage(
     secondaryLabel: String? = null,
     onSecondary: (() -> Unit)? = null,
 ) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = MontageSpacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -192,100 +201,127 @@ private fun OnboardingPage(
                 .contourGlow(shape = CircleShape, intensity = 1.2f),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
+            MontageIcon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(48.dp),
+                tint = colors.accent,
+                modifier = Modifier.size(MontageIcons.hero),
             )
         }
-        Spacer(Modifier.height(32.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.xxl))
+        MontageText(
             text = title,
-            style = MaterialTheme.typography.headlineMedium,
+            style = typography.title,
+            color = colors.textPrimary,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(12.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.md))
+        MontageText(
             text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = typography.body,
+            color = colors.textSecondary,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(36.dp))
-        Button(
+        Spacer(Modifier.height(MontageSpacing.xxxl))
+        MontagePrimaryButton(
             onClick = onPrimary,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
         ) {
-            Text(primaryLabel)
+            MontageText(
+                text = primaryLabel,
+                style = typography.label,
+                color = colors.textOnAccent,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
         if (secondaryLabel != null && onSecondary != null) {
-            Spacer(Modifier.height(4.dp))
-            TextButton(onClick = onSecondary) { Text(secondaryLabel) }
+            Spacer(Modifier.height(MontageSpacing.xs))
+            MontageSecondaryButton(
+                onClick = onSecondary,
+            ) {
+                MontageText(
+                    text = secondaryLabel,
+                    style = typography.label,
+                    color = colors.textSecondary,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun ScanningPage(scanState: ScanState) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = MontageSpacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(
+        MontageIcon(
             imageVector = Icons.Rounded.LibraryMusic,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = colors.accent,
             modifier = Modifier.size(56.dp),
         )
-        Spacer(Modifier.height(24.dp))
-        Text(
+        Spacer(Modifier.height(MontageSpacing.xl))
+        MontageText(
             text = "Building your library",
-            style = MaterialTheme.typography.headlineSmall,
+            style = typography.heading,
+            color = colors.textPrimary,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(MontageSpacing.xl))
 
         when (val state = scanState) {
             is ScanState.Scanning -> {
                 if (state.total > 0) {
-                    LinearProgressIndicator(
-                        progress = { state.progress },
+                    MontageLinearProgress(
+                        progress = state.progress,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
+                    Spacer(Modifier.height(MontageSpacing.sm))
+                    MontageText(
                         text = "${state.scanned} of ${state.total} tracks",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = typography.caption,
+                        color = colors.textSecondary,
                     )
                 } else {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    MontageLinearProgress(
+                        progress = 0.1f,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
 
-            is ScanState.Failed -> Text(
+            is ScanState.Failed -> MontageText(
                 text = state.message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
+                style = typography.body,
+                color = colors.error,
                 textAlign = TextAlign.Center,
             )
 
-            else -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            else -> MontageLinearProgress(
+                progress = 0.1f,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
 
 @Composable
 private fun StepIndicator(current: Int, total: Int, modifier: Modifier = Modifier) {
+    val colors = MontageTheme.colors
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(MontageSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(total) { index ->
@@ -297,9 +333,9 @@ private fun StepIndicator(current: Int, total: Int, modifier: Modifier = Modifie
                     .clip(CircleShape)
                     .background(
                         if (active) {
-                            MaterialTheme.colorScheme.primary
+                            colors.accent
                         } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                            colors.textTertiary.copy(alpha = 0.3f)
                         },
                     ),
             )
