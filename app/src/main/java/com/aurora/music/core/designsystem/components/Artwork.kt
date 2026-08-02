@@ -7,8 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MusicNote
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,32 +18,25 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.aurora.music.core.designsystem.contourGlow
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageShapes
+import com.aurora.music.core.designsystem.montage.MontageTheme
 import com.aurora.music.domain.repository.ArtworkShape
 
-/**
- * Album art with an elegant fallback. Loading is async + cached (Section 8
- * performance goals), and the placeholder never flashes a hard grey box.
- */
 @Composable
 fun Artwork(
     uri: String?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(MontageShapes.small),
     glow: Boolean = false,
     crossfade: Boolean = true,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val colors = MontageTheme.colors
     val base = if (glow) modifier.contourGlow(shape = shape) else modifier
-
     Box(
         modifier = base.clip(shape).background(
-            Brush.linearGradient(
-                listOf(
-                    scheme.surfaceContainerHighest,
-                    scheme.surfaceContainer,
-                ),
-            ),
+            Brush.linearGradient(listOf(colors.surfaceVariant, colors.backgroundSecondary)),
         ),
         contentAlignment = Alignment.Center,
     ) {
@@ -53,10 +44,7 @@ fun Artwork(
             ArtworkFallback()
         } else {
             SubcomposeAsyncImage(
-                model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                    .data(uri)
-                    .crossfade(crossfade)
-                    .build(),
+                model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current).data(uri).crossfade(crossfade).build(),
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
@@ -69,16 +57,16 @@ fun Artwork(
 
 @Composable
 private fun ArtworkFallback() {
-    Icon(
+    MontageIcon(
         imageVector = Icons.Rounded.MusicNote,
         contentDescription = null,
-        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+        tint = MontageTheme.colors.textTertiary.copy(alpha = 0.45f),
         modifier = Modifier.fillMaxSize(0.4f),
     )
 }
 
 fun ArtworkShape.toComposeShape(): Shape = when (this) {
-    ArtworkShape.ROUNDED -> RoundedCornerShape(28.dp)
+    ArtworkShape.ROUNDED -> RoundedCornerShape(MontageShapes.hero)
     ArtworkShape.SQUARE -> RoundedCornerShape(0.dp)
     ArtworkShape.CIRCLE -> CircleShape
     ArtworkShape.FULL_BLEED -> RoundedCornerShape(0.dp)

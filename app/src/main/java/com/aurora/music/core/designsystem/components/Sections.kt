@@ -18,10 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +25,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aurora.music.core.common.formatTrackCount
+import com.aurora.music.core.designsystem.montage.MontageChip
+import com.aurora.music.core.designsystem.montage.MontageIcon
+import com.aurora.music.core.designsystem.montage.MontageShapes
+import com.aurora.music.core.designsystem.montage.MontageSpacing
+import com.aurora.music.core.designsystem.montage.MontageText
+import com.aurora.music.core.designsystem.montage.MontageTheme
+import com.aurora.music.core.designsystem.montage.MontageTypography
 import com.aurora.music.domain.model.Album
 import com.aurora.music.domain.model.Artist
 import com.aurora.music.domain.model.MediaItem
@@ -40,153 +43,62 @@ fun SectionHeader(
     subtitle: String? = null,
     onSeeAll: (() -> Unit)? = null,
 ) {
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, end = 8.dp, top = 20.dp, bottom = 8.dp),
+        modifier = modifier.fillMaxWidth().padding(start = MontageSpacing.screenHorizontal, end = MontageSpacing.sm, top = MontageSpacing.sectionGap, bottom = MontageSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            if (subtitle != null) {
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            MontageText(text = title, style = typography.heading, color = colors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+            if (subtitle != null) { MontageText(text = subtitle, style = typography.caption, color = colors.textSecondary) }
         }
-        if (onSeeAll != null) {
-            TextButton(onClick = onSeeAll) {
-                Text("See all", style = MaterialTheme.typography.labelLarge)
-                Spacer(Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
+        if (onSeeAll != null) { MontageChip(label = "See all", selected = false, onClick = onSeeAll) }
     }
 }
 
-/** Horizontal carousel of tracks used throughout Home and Discover. */
 @Composable
-fun SongCarousel(
-    items: List<MediaItem>,
-    onItemClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    cardSize: androidx.compose.ui.unit.Dp = 150.dp,
-) {
+fun SongCarousel(items: List<MediaItem>, onItemClick: (Int) -> Unit, modifier: Modifier = Modifier, cardSize: androidx.compose.ui.unit.Dp = 150.dp) {
     if (items.isEmpty()) return
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
+    LazyRow(modifier = modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = MontageSpacing.screenHorizontal), horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md)) {
         itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-            MediaCard(
-                title = item.title,
-                subtitle = item.artist,
-                artworkUri = item.artworkUri,
-                size = cardSize,
-                onClick = { onItemClick(index) },
-            )
+            MediaCard(title = item.title, subtitle = item.artist, artworkUri = item.artworkUri, size = cardSize, onClick = { onItemClick(index) })
         }
     }
 }
 
 @Composable
-fun AlbumCarousel(
-    albums: List<Album>,
-    onAlbumClick: (Album) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun AlbumCarousel(albums: List<Album>, onAlbumClick: (Album) -> Unit, modifier: Modifier = Modifier) {
     if (albums.isEmpty()) return
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
+    LazyRow(modifier = modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = MontageSpacing.screenHorizontal), horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md)) {
         items(albums, key = { it.id }) { album ->
-            MediaCard(
-                title = album.title,
-                subtitle = album.artist,
-                artworkUri = album.artworkUri,
-                onClick = { onAlbumClick(album) },
-            )
+            MediaCard(title = album.title, subtitle = album.artist, artworkUri = album.artworkUri, onClick = { onAlbumClick(album) })
         }
     }
 }
 
 @Composable
-fun ArtistCarousel(
-    artists: List<Artist>,
-    onArtistClick: (Artist) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ArtistCarousel(artists: List<Artist>, onArtistClick: (Artist) -> Unit, modifier: Modifier = Modifier) {
     if (artists.isEmpty()) return
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
+    LazyRow(modifier = modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = MontageSpacing.screenHorizontal), horizontalArrangement = Arrangement.spacedBy(MontageSpacing.md)) {
         items(artists, key = { it.id }) { artist ->
-            MediaCard(
-                title = artist.name,
-                subtitle = formatTrackCount(artist.trackCount),
-                artworkUri = artist.artworkUri,
-                shape = CircleShape,
-                onClick = { onArtistClick(artist) },
-            )
+            MediaCard(title = artist.name, subtitle = formatTrackCount(artist.trackCount), artworkUri = artist.artworkUri, shape = CircleShape, onClick = { onArtistClick(artist) })
         }
     }
 }
 
 @Composable
 fun MediaCard(
-    title: String,
-    subtitle: String,
-    artworkUri: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: androidx.compose.ui.unit.Dp = 150.dp,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(20.dp),
+    title: String, subtitle: String, artworkUri: String?, onClick: () -> Unit,
+    modifier: Modifier = Modifier, size: androidx.compose.ui.unit.Dp = 150.dp,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(MontageShapes.card),
 ) {
-    Column(
-        modifier = modifier
-            .width(size)
-            .clickable(onClick = onClick),
-    ) {
-        Artwork(
-            uri = artworkUri,
-            contentDescription = title,
-            shape = shape,
-            glow = true,
-            modifier = Modifier.size(size),
-        )
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = if (shape == CircleShape) TextAlign.Center else TextAlign.Start,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = if (shape == CircleShape) TextAlign.Center else TextAlign.Start,
-            modifier = Modifier.fillMaxWidth(),
-        )
+    val colors = MontageTheme.colors
+    val typography = MontageTheme.typography
+    Column(modifier = modifier.width(size).clickable(onClick = onClick)) {
+        Artwork(uri = artworkUri, contentDescription = title, shape = shape, glow = true, modifier = Modifier.size(size))
+        Spacer(Modifier.height(MontageSpacing.sm))
+        MontageText(text = title, style = typography.caption, color = colors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = if (shape == CircleShape) TextAlign.Center else TextAlign.Start, modifier = Modifier.fillMaxWidth())
+        MontageText(text = subtitle, style = typography.mini, color = colors.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = if (shape == CircleShape) TextAlign.Center else TextAlign.Start, modifier = Modifier.fillMaxWidth())
     }
 }
