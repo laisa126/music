@@ -314,7 +314,6 @@ private fun SleepTimerBottomSheet(currentRemainingMs: Long, onSelect: (SleepTime
         currentRemainingMs <= 90 * 60 * 1000L -> SleepTimerOption.NINETY
         else -> SleepTimerOption.ONE_TWENTY
     }
-    val typography = MontageTheme.typography; val colors = MontageTheme.colors
     MontageBottomSheet(visible = true, onDismiss = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = MontageSpacing.xl, vertical = MontageSpacing.md).padding(bottom = MontageSpacing.xxxl)) {
             MontageText(text = "Sleep Timer", style = typography.heading, color = colors.textPrimary, fontWeight = FontWeight.Bold)
