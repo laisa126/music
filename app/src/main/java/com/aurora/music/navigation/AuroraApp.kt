@@ -241,10 +241,10 @@ private fun AuroraNavHost(
         ) {
             PlayerScreen(
                 onCollapse = { navController.popBackStack() },
-                onOpenQueue = { navController.navigate(Routes.QUEUE) },
-                onOpenLyrics = { navController.navigate(Routes.LYRICS) },
-                onOpenEqualizer = { navController.navigate(Routes.EQUALIZER) },
-                onOpenSleepTimer = { navController.navigate(Routes.EQUALIZER) },
+                onOpenAlbum = { navController.navigate(Routes.album(it)) },
+                onOpenArtist = { navController.navigate(Routes.artist(it)) },
+                onOpenFileInfo = { navController.navigate(Routes.fileInfo(it)) },
+                onOpenMetadataEditor = { navController.navigate(Routes.metadataEditor(it)) },
             )
         }
 
