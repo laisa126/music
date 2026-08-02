@@ -149,7 +149,10 @@ fun DiscoverScreen(
                 SectionHeader(title = "Albums", onSeeAll = { onSeeAll("albums") })
             }
             item(key = "albums") {
-                AlbumCarousel(state.albums.take(20)) { onOpenAlbum(it.id) }
+                AlbumCarousel(
+                    albums = state.albums.take(20),
+                    onAlbumClick = { album -> onOpenAlbum(album.id) },
+                )
             }
         }
 
@@ -158,7 +161,10 @@ fun DiscoverScreen(
                 SectionHeader(title = "Artists", onSeeAll = { onSeeAll("artists") })
             }
             item(key = "artists") {
-                ArtistCarousel(state.artists.take(20)) { onOpenArtist(it.id) }
+                ArtistCarousel(
+                    artists = state.artists.take(20),
+                    onArtistClick = { artist -> onOpenArtist(artist.id) },
+                )
             }
         }
 

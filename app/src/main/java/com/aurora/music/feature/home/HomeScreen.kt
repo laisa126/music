@@ -183,7 +183,10 @@ private fun HomeContent(
                 )
             }
             item(key = "favAlbums") {
-                AlbumCarousel(state.favouriteAlbums) { onOpenAlbum(it.id) }
+                AlbumCarousel(
+                    albums = state.favouriteAlbums,
+                    onAlbumClick = { album -> onOpenAlbum(album.id) },
+                )
             }
         }
 
@@ -195,7 +198,10 @@ private fun HomeContent(
                 )
             }
             item(key = "favArtists") {
-                ArtistCarousel(state.favouriteArtists) { onOpenArtist(it.id) }
+                ArtistCarousel(
+                    artists = state.favouriteArtists,
+                    onArtistClick = { artist -> onOpenArtist(artist.id) },
+                )
             }
         }
 
