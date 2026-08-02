@@ -28,15 +28,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.components.Artwork
-import com.aurora.music.core.designsystem.glassSurface
-import com.aurora.music.domain.model.MediaItem
+import com.aurora.music.core.designsystem.components.LoadingState
 
 /**
  * Detailed file information screen showing codec, bitrate, sample rate,
@@ -47,10 +46,9 @@ import com.aurora.music.domain.model.MediaItem
 fun FileInfoScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CollectionDetailViewModel = hiltViewModel(),
+    viewModel: TrackDetailViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val track = state.tracks.firstOrNull()
+    val track by viewModel.track.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
@@ -66,25 +64,11 @@ fun FileInfoScreen(
         },
     ) { padding ->
         if (track == null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Icon(
-                    Icons.Rounded.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(48.dp),
-                )
-                Spacer(Modifier.height(16.dp))
-                Text("No track selected", style = MaterialTheme.typography.titleMedium)
-            }
+            LoadingState(modifier = Modifier.padding(padding))
             return@Scaffold
         }
+
+        val t = track!!
 
         LazyColumn(
             modifier = Modifier
@@ -100,20 +84,20 @@ fun FileInfoScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Artwork(
-                        uri = track.artworkUri,
-                        contentDescription = track.album,
+                        uri = t.artworkUri,
+                        contentDescription = t.album,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.size(80.dp),
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = track.title,
+                            text = t.title,
                             style = MaterialTheme.typography.titleMedium,
                             maxLines = 2,
                         )
                         Text(
-                            text = track.artist,
+                            text = t.artist,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -126,24 +110,24 @@ fun FileInfoScreen(
             // Audio section
             item {
                 SectionHeader("Audio")
-                InfoRow(Icons.Rounded.GraphicEq, "Format", track.qualityBadge)
-                InfoRow(Icons.Rounded.AudioFile, "MIME type", track.mimeType ?: "Unknown")
+                InfoRow(Icons.Rounded.GraphicEq, "Format", t.qualityBadge)
+                InfoRow(Icons.Rounded.AudioFile, "MIME type", t.mimeType ?: "Unknown")
                 InfoRow(Icons.Rounded.MusicNote, "Bitrate",
-                    if (track.bitrateKbps > 0) "${track.bitrateKbps} kbps" else "Unknown")
+                    if (t.bitrateKbps > 0) "${t.bitrateKbps} kbps" else "Unknown")
                 InfoRow(Icons.Rounded.Album, "Sample rate",
-                    if (track.sampleRateHz > 0) "${"%.1f".format(track.sampleRateHz / 1000.0)} kHz" else "Unknown")
+                    if (t.sampleRateHz > 0) "${"%.1f".format(t.sampleRateHz / 1000.0)} kHz" else "Unknown")
                 InfoRow(Icons.Rounded.Album, "Bit depth",
-                    if (track.bitDepth > 0) "${track.bitDepth}-bit" else "Unknown")
+                    if (t.bitDepth > 0) "${t.bitDepth}-bit" else "Unknown")
                 InfoRow(Icons.Rounded.Album, "Channels",
-                    when (track.channels) {
+                    when (t.channels) {
                         1 -> "Mono"
                         2 -> "Stereo"
                         6 -> "5.1 surround"
-                        in 3..5 -> "${track.channels} channels"
-                        else -> if (track.channels > 0) "${track.channels} channels" else "Unknown"
+                        in 3..5 -> "${t.channels} channels"
+                        else -> if (t.channels > 0) "${t.channels} channels" else "Unknown"
                     })
                 InfoRow(Icons.Rounded.Album, "Lossless",
-                    if (track.isLossless) "Yes" else "No")
+                    if (t.isLossless) "Yes" else "No")
             }
 
             item { Spacer(Modifier.height(8.dp)) }
@@ -151,21 +135,19 @@ fun FileInfoScreen(
             // File section
             item {
                 SectionHeader("File")
-                InfoRow(Icons.Rounded.AudioFile, "File name",
-                    track.fileName ?: "Unknown")
+                InfoRow(Icons.Rounded.AudioFile, "File name", t.fileName ?: "Unknown")
                 InfoRow(Icons.Rounded.Info, "File size",
-                    if (track.fileSizeBytes > 0) formatFileSize(track.fileSizeBytes) else "Unknown")
-                InfoRow(Icons.Rounded.Info, "Path",
-                    track.filePath ?: "Unknown")
+                    if (t.fileSizeBytes > 0) formatFileSize(t.fileSizeBytes) else "Unknown")
+                InfoRow(Icons.Rounded.Info, "Path", t.filePath ?: "Unknown")
                 InfoRow(Icons.Rounded.Info, "Date added",
-                    if (track.dateAddedEpochSeconds > 0)
+                    if (t.dateAddedEpochSeconds > 0)
                         java.text.SimpleDateFormat.getDateTimeInstance()
-                            .format(java.util.Date(track.dateAddedEpochSeconds * 1000))
+                            .format(java.util.Date(t.dateAddedEpochSeconds * 1000))
                     else "Unknown")
                 InfoRow(Icons.Rounded.Info, "Date modified",
-                    if (track.dateModifiedEpochSeconds > 0)
+                    if (t.dateModifiedEpochSeconds > 0)
                         java.text.SimpleDateFormat.getDateTimeInstance()
-                            .format(java.util.Date(track.dateModifiedEpochSeconds * 1000))
+                            .format(java.util.Date(t.dateModifiedEpochSeconds * 1000))
                     else "Unknown")
             }
 
@@ -174,23 +156,20 @@ fun FileInfoScreen(
             // Track metadata section
             item {
                 SectionHeader("Track metadata")
-                InfoRow(Icons.Rounded.MusicNote, "Title", track.title)
-                InfoRow(Icons.Rounded.MusicNote, "Artist", track.artist)
-                InfoRow(Icons.Rounded.Album, "Album", track.album)
-                InfoRow(Icons.Rounded.MusicNote, "Album artist",
-                    track.albumArtist ?: "Not set")
-                InfoRow(Icons.Rounded.MusicNote, "Composer",
-                    track.composer ?: "Not set")
-                InfoRow(Icons.Rounded.MusicNote, "Genre",
-                    track.genre ?: "Not set")
+                InfoRow(Icons.Rounded.MusicNote, "Title", t.title)
+                InfoRow(Icons.Rounded.MusicNote, "Artist", t.artist)
+                InfoRow(Icons.Rounded.Album, "Album", t.album)
+                InfoRow(Icons.Rounded.MusicNote, "Album artist", t.albumArtist ?: "Not set")
+                InfoRow(Icons.Rounded.MusicNote, "Composer", t.composer ?: "Not set")
+                InfoRow(Icons.Rounded.MusicNote, "Genre", t.genre ?: "Not set")
                 InfoRow(Icons.Rounded.Info, "Year",
-                    if (track.year > 0) track.year.toString() else "Not set")
+                    if (t.year > 0) t.year.toString() else "Not set")
                 InfoRow(Icons.Rounded.Info, "Track number",
-                    if (track.trackNumber > 0) track.trackNumber.toString() else "Not set")
+                    if (t.trackNumber > 0) t.trackNumber.toString() else "Not set")
                 InfoRow(Icons.Rounded.Info, "Disc number",
-                    if (track.discNumber > 0) track.discNumber.toString() else "Not set")
+                    if (t.discNumber > 0) t.discNumber.toString() else "Not set")
                 InfoRow(Icons.Rounded.Info, "Duration",
-                    com.aurora.music.core.common.formatDuration(track.durationMs))
+                    com.aurora.music.core.common.formatDuration(t.durationMs))
             }
         }
     }

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aurora.music.core.designsystem.components.Artwork
-import com.aurora.music.domain.model.MediaItem
+import com.aurora.music.core.designsystem.components.LoadingState
 
 /**
  * Metadata editor screen for editing track tags (spec Section 9).
@@ -50,20 +50,9 @@ import com.aurora.music.domain.model.MediaItem
 fun MetadataEditorScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CollectionDetailViewModel = hiltViewModel(),
+    viewModel: TrackDetailViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val track = state.tracks.firstOrNull()
-
-    var title by remember(track?.title) { mutableStateOf(track?.title ?: "") }
-    var artist by remember(track?.artist) { mutableStateOf(track?.artist ?: "") }
-    var album by remember(track?.album) { mutableStateOf(track?.album ?: "") }
-    var albumArtist by remember(track?.albumArtist) { mutableStateOf(track?.albumArtist ?: "") }
-    var composer by remember(track?.composer) { mutableStateOf(track?.composer ?: "") }
-    var genre by remember(track?.genre) { mutableStateOf(track?.genre ?: "") }
-    var year by remember(track?.year) { mutableStateOf(track?.year?.toString() ?: "") }
-    var trackNumber by remember(track?.trackNumber) { mutableStateOf(track?.trackNumber?.toString() ?: "") }
-    var discNumber by remember(track?.discNumber) { mutableStateOf(track?.discNumber?.toString() ?: "") }
+    val track by viewModel.track.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
@@ -93,6 +82,7 @@ fun MetadataEditorScreen(
                             viewModel.updateMetadata(updated)
                             onBack()
                         },
+                        enabled = track != null,
                     ) {
                         Icon(Icons.Rounded.Save, contentDescription = "Save")
                     }
@@ -101,25 +91,21 @@ fun MetadataEditorScreen(
         },
     ) { padding ->
         if (track == null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Icon(
-                    Icons.Rounded.Edit,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(48.dp),
-                )
-                Spacer(Modifier.height(16.dp))
-                Text("No track selected", style = MaterialTheme.typography.titleMedium)
-            }
+            LoadingState(modifier = Modifier.padding(padding))
             return@Scaffold
         }
+
+        val t = track!!
+
+        var title by remember(t.title) { mutableStateOf(t.title) }
+        var artist by remember(t.artist) { mutableStateOf(t.artist) }
+        var album by remember(t.album) { mutableStateOf(t.album) }
+        var albumArtist by remember(t.albumArtist) { mutableStateOf(t.albumArtist ?: "") }
+        var composer by remember(t.composer) { mutableStateOf(t.composer ?: "") }
+        var genre by remember(t.genre) { mutableStateOf(t.genre ?: "") }
+        var year by remember(t.year) { mutableStateOf(t.year.toString()) }
+        var trackNumber by remember(t.trackNumber) { mutableStateOf(t.trackNumber.toString()) }
+        var discNumber by remember(t.discNumber) { mutableStateOf(t.discNumber.toString()) }
 
         LazyColumn(
             modifier = Modifier
@@ -135,20 +121,20 @@ fun MetadataEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Artwork(
-                        uri = track.artworkUri,
-                        contentDescription = track.album,
+                        uri = t.artworkUri,
+                        contentDescription = t.album,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.size(80.dp),
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = track.fileName ?: track.title,
+                            text = t.fileName ?: t.title,
                             style = MaterialTheme.typography.titleSmall,
                             maxLines = 2,
                         )
                         Text(
-                            text = track.qualityBadge,
+                            text = t.qualityBadge,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -258,7 +244,7 @@ fun MetadataEditorScreen(
                 Spacer(Modifier.height(8.dp))
                 Button(
                     onClick = {
-                        val updated = track.copy(
+                        val updated = t.copy(
                             title = title.trim(),
                             artist = artist.trim(),
                             album = album.trim(),
